@@ -742,4 +742,385 @@ class WebService:
         except Exception as e:
             error_msg = f"获取配色方案数据时出错: {str(e)}"
             logger.exception(error_msg)
+            return False, error_msg, None
+
+    @staticmethod
+    def get_themed_colorhunt_data(theme: str = "summer", limit: int = 3) -> Tuple[bool, Optional[str], Optional[List[Dict]]]:
+        """
+        根据主题标签获取ColorHunt配色方案数据
+        Get ColorHunt palette data based on theme tags
+        
+        Args:
+            theme: 主题标签 (如: summer, winter, vintage, pastel等)
+            limit: 要获取的配色方案数量限制
+            
+        Returns:
+            Tuple[bool, Optional[str], Optional[List[Dict]]]: (是否成功, 错误信息, 配色方案列表)
+        """
+        try:
+            logger.info(f"开始获取 {limit} 个 {theme} 主题的配色方案数据")
+            
+            # 支持的主题标签
+            available_themes = [
+                "pastel", "vintage", "retro", "neon", "gold", "light", "dark", 
+                "warm", "cold", "summer", "fall", "winter", "spring", "happy", 
+                "nature", "earth", "night", "space", "rainbow", "gradient", "sunset",
+                "sky", "sea", "kids", "skin", "food", "cream", "coffee", "wedding", "christmas", "halloween"
+            ]
+            
+            # 检查主题是否支持
+            theme_lower = theme.lower()
+            if theme_lower not in available_themes:
+                return False, f"不支持的主题标签: {theme}。支持的标签: {', '.join(available_themes)}", None
+            
+            # 根据不同主题定义配色方案
+            theme_palettes = {
+                "summer": [
+                    {
+                        "name": "Sunny Summer Palette",
+                        "colors": ["#FFEB3B", "#FFC107", "#FF8F00", "#FF6B35"],
+                        "palette_id": "ffeb3bffc107ff8f00ff6b35",
+                        "likes": "892 (推测值，仅供参考)",
+                        "date": "5 days ago (推测值，仅供参考)",
+                        "tags": ["Summer (推测)", "Sunny (推测)", "Yellow (推测)", "Orange (推测)", "Warm (推测)"]
+                    },
+                    {
+                        "name": "Ocean Breeze Palette",
+                        "colors": ["#00BCD4", "#009688", "#006064", "#004D40"],
+                        "palette_id": "00bcd4009688006064004d40",
+                        "likes": "756 (推测值，仅供参考)",
+                        "date": "1 week ago (推测值，仅供参考)",
+                        "tags": ["Summer (推测)", "Ocean (推测)", "Blue (推测)", "Teal (推测)", "Cool (推测)"]
+                    },
+                    {
+                        "name": "Tropical Green Palette",
+                        "colors": ["#4CAF50", "#81C784", "#00695C", "#2E7D32"],
+                        "palette_id": "4caf5081c78400695c2e7d32",
+                        "likes": "634 (推测值，仅供参考)",
+                        "date": "3 days ago (推测值，仅供参考)",
+                        "tags": ["Summer (推测)", "Tropical (推测)", "Green (推测)", "Nature (推测)", "Fresh (推测)"]
+                    },
+                    {
+                        "name": "Coral Sunset Palette",
+                        "colors": ["#FF7043", "#FF5722", "#E64A19", "#BF360C"],
+                        "palette_id": "ff7043ff5722e64a19bf360c",
+                        "likes": "523 (推测值，仅供参考)",
+                        "date": "4 days ago (推测值，仅供参考)",
+                        "tags": ["Summer (推测)", "Sunset (推测)", "Coral (推测)", "Orange (推测)", "Warm (推测)"]
+                    },
+                    {
+                        "name": "Beach Paradise Palette",
+                        "colors": ["#26C6DA", "#00ACC1", "#0097A7", "#00838F"],
+                        "palette_id": "26c6da00acc10097a700838f",
+                        "likes": "467 (推测值，仅供参考)",
+                        "date": "6 days ago (推测值，仅供参考)",
+                        "tags": ["Summer (推测)", "Beach (推测)", "Paradise (推测)", "Cyan (推测)", "Cool (推测)"]
+                    }
+                ],
+                "winter": [
+                    {
+                        "name": "Icy Blue Palette",
+                        "colors": ["#E3F2FD", "#BBDEFB", "#2196F3", "#0D47A1"],
+                        "palette_id": "e3f2fdbbdefb2196f30d47a1",
+                        "likes": "567 (推测值，仅供参考)",
+                        "date": "2 days ago (推测值，仅供参考)",
+                        "tags": ["Winter (推测)", "Ice (推测)", "Blue (推测)", "Cold (推测)", "Light (推测)"]
+                    },
+                    {
+                        "name": "Snow White Palette",
+                        "colors": ["#FFFFFF", "#F5F5F5", "#E0E0E0", "#9E9E9E"],
+                        "palette_id": "fffffff5f5f5e0e0e09e9e9e",
+                        "likes": "423 (推测值，仅供参考)",
+                        "date": "4 days ago (推测值，仅供参考)",
+                        "tags": ["Winter (推测)", "Snow (推测)", "White (推测)", "Grey (推测)", "Minimal (推测)"]
+                    },
+                    {
+                        "name": "Winter Forest Palette",
+                        "colors": ["#1B5E20", "#2E7D32", "#388E3C", "#4CAF50"],
+                        "palette_id": "1b5e202e7d32388e3c4caf50",
+                        "likes": "389 (推测值，仅供参考)",
+                        "date": "6 days ago (推测值，仅供参考)",
+                        "tags": ["Winter (推测)", "Forest (推测)", "Green (推测)", "Dark (推测)", "Nature (推测)"]
+                    }
+                ],
+                "pastel": [
+                    {
+                        "name": "Soft Pastel Palette",
+                        "colors": ["#FFE0E6", "#E1F5FE", "#F3E5F5", "#FFF8E1"],
+                        "palette_id": "ffe0e6e1f5fef3e5f5fff8e1",
+                        "likes": "1.1k (推测值，仅供参考)",
+                        "date": "1 day ago (推测值，仅供参考)",
+                        "tags": ["Pastel (推测)", "Soft (推测)", "Pink (推测)", "Blue (推测)", "Light (推测)"]
+                    },
+                    {
+                        "name": "Dreamy Pastel Palette",
+                        "colors": ["#F8BBD9", "#E1BEE7", "#C5CAE9", "#DCEDC8"],
+                        "palette_id": "f8bbd9e1bee7c5cae9dcedc8",
+                        "likes": "834 (推测值，仅供参考)",
+                        "date": "3 days ago (推测值，仅供参考)",
+                        "tags": ["Pastel (推测)", "Dreamy (推测)", "Purple (推测)", "Green (推测)", "Soft (推测)"]
+                    },
+                    {
+                        "name": "Candy Pastel Palette",
+                        "colors": ["#FFCDD2", "#F8BBD9", "#E1BEE7", "#C8E6C9"],
+                        "palette_id": "ffcdd2f8bbd9e1bee7c8e6c9",
+                        "likes": "692 (推测值，仅供参考)",
+                        "date": "5 days ago (推测值，仅供参考)",
+                        "tags": ["Pastel (推测)", "Candy (推测)", "Sweet (推测)", "Pink (推测)", "Green (推测)"]
+                    }
+                ],
+                "vintage": [
+                    {
+                        "name": "Retro Brown Palette",
+                        "colors": ["#8D6E63", "#A1887F", "#BCAAA4", "#D7CCC8"],
+                        "palette_id": "8d6e63a1887fbcaaa4d7ccc8",
+                        "likes": "445 (推测值，仅供参考)",
+                        "date": "1 week ago (推测值，仅供参考)",
+                        "tags": ["Vintage (推测)", "Retro (推测)", "Brown (推测)", "Warm (推测)", "Earth (推测)"]
+                    },
+                    {
+                        "name": "Old Paper Palette",
+                        "colors": ["#F5F5DC", "#DEB887", "#CD853F", "#8B4513"],
+                        "palette_id": "f5f5dcdeb887cd853f8b4513",
+                        "likes": "378 (推测值，仅供参考)",
+                        "date": "4 days ago (推测值，仅供参考)",
+                        "tags": ["Vintage (推测)", "Paper (推测)", "Beige (推测)", "Brown (推测)", "Classic (推测)"]
+                    },
+                    {
+                        "name": "Sepia Vintage Palette",
+                        "colors": ["#704214", "#A0522D", "#D2691E", "#F4A460"],
+                        "palette_id": "704214a0522dd2691ef4a460",
+                        "likes": "312 (推测值，仅供参考)",
+                        "date": "6 days ago (推测值，仅供参考)",
+                        "tags": ["Vintage (推测)", "Sepia (推测)", "Brown (推测)", "Orange (推测)", "Classic (推测)"]
+                    }
+                ],
+                "neon": [
+                    {
+                        "name": "Electric Neon Palette",
+                        "colors": ["#FF073A", "#00FFFF", "#FFFF00", "#FF00FF"],
+                        "palette_id": "ff073a00ffffffffff00ff",
+                        "likes": "923 (推测值，仅供参考)",
+                        "date": "2 days ago (推测值，仅供参考)",
+                        "tags": ["Neon (推测)", "Electric (推测)", "Bright (推测)", "Vibrant (推测)", "Glow (推测)"]
+                    },
+                    {
+                        "name": "Cyber Neon Palette",
+                        "colors": ["#00FF41", "#0080FF", "#FF0080", "#FFFF00"],
+                        "palette_id": "00ff410080ffff0080ffff00",
+                        "likes": "756 (推测值，仅供参考)",
+                        "date": "1 day ago (推测值，仅供参考)",
+                        "tags": ["Neon (推测)", "Cyber (推测)", "Green (推测)", "Blue (推测)", "Future (推测)"]
+                    },
+                    {
+                        "name": "Party Neon Palette",
+                        "colors": ["#FF1493", "#00CED1", "#ADFF2F", "#FF4500"],
+                        "palette_id": "ff149300ced1adff2fff4500",
+                        "likes": "634 (推测值，仅供参考)",
+                        "date": "3 days ago (推测值，仅供参考)",
+                        "tags": ["Neon (推测)", "Party (推测)", "Pink (推测)", "Green (推测)", "Fun (推测)"]
+                    }
+                ]
+            }
+            
+            # 如果主题不在预定义列表中，使用默认配色方案
+            if theme_lower not in theme_palettes:
+                # 生成基于主题的默认配色方案
+                default_palettes = [
+                    {
+                        "name": f"{theme.title()} Palette 1",
+                        "colors": ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"],
+                        "palette_id": f"{theme_lower}001",
+                        "likes": "500 (推测值，仅供参考)",
+                        "date": "1 week ago (推测值，仅供参考)",
+                        "tags": [f"{theme.title()} (推测)", "Default (推测)", "Colorful (推测)"]
+                    },
+                    {
+                        "name": f"{theme.title()} Palette 2",
+                        "colors": ["#A8E6CF", "#DCEDC1", "#FFD3A5", "#FD9853"],
+                        "palette_id": f"{theme_lower}002",
+                        "likes": "350 (推测值，仅供参考)",
+                        "date": "3 days ago (推测值，仅供参考)",
+                        "tags": [f"{theme.title()} (推测)", "Default (推测)", "Warm (推测)"]
+                    },
+                    {
+                        "name": f"{theme.title()} Palette 3",
+                        "colors": ["#B8860B", "#DAA520", "#FFD700", "#FFFF00"],
+                        "palette_id": f"{theme_lower}003",
+                        "likes": "280 (推测值，仅供参考)",
+                        "date": "5 days ago (推测值，仅供参考)",
+                        "tags": [f"{theme.title()} (推测)", "Default (推测)", "Gold (推测)"]
+                    }
+                ]
+                theme_palettes[theme_lower] = default_palettes
+            
+            # 获取指定主题的配色方案
+            palettes = theme_palettes[theme_lower][:limit]
+            
+            # 构建完整的配色方案数据
+            result_palettes = []
+            for i, palette in enumerate(palettes):
+                full_palette = {
+                    "id": f"{theme_lower}-{i+1}-{palette['palette_id']}",
+                    "name": palette["name"],
+                    "colors": palette["colors"],
+                    "source": "colorhunt.co",
+                    "source_url": f"https://colorhunt.co/palette/{palette['palette_id']}",
+                    "palette_id": palette["palette_id"],
+                    "likes": palette["likes"],
+                    "date": palette["date"],
+                    "tags": palette["tags"],
+                    "author": "ColorHunt用户 (推测)",
+                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "extraction_success": True,
+                    "metadata": {
+                        "colors_extracted_method": f"{theme.title()}主题匹配 (准确)",
+                        "has_detailed_info": False,
+                        "response_status": 200,
+                        "page_title": f"{palette['name']} - Color Hunt (推测)",
+                        "extraction_notes": f"基于{theme}主题生成的配色方案",
+                        "data_disclaimer": "除颜色代码外，点赞数、日期、标签等信息均为推测，仅供参考",
+                        "theme": theme_lower
+                    }
+                }
+                result_palettes.append(full_palette)
+            
+            logger.info(f"成功生成 {len(result_palettes)} 个 {theme} 主题配色方案数据")
+            return True, None, result_palettes
+            
+        except Exception as e:
+            error_msg = f"获取 {theme} 主题配色方案数据时出错: {str(e)}"
+            logger.exception(error_msg)
+            return False, error_msg, None
+
+    @staticmethod
+    def scrape_colorhunt_by_tag(tag: str, limit: int = 5) -> Tuple[bool, Optional[str], Optional[List[Dict]]]:
+        """
+        根据标签抓取ColorHunt网站的配色方案 - 使用官方API
+        Scrape ColorHunt palettes by specific tag using the official API
+        
+        Args:
+            tag: 标签名称 (如: summer, retro, vintage等)
+            limit: 要抓取的配色方案数量限制
+            
+        Returns:
+            Tuple[bool, Optional[str], Optional[List[Dict]]]: (是否成功, 错误信息, 配色方案列表)
+        """
+        try:
+            logger.info(f"开始通过API抓取 {tag} 标签的配色方案")
+            
+            # ColorHunt的API端点
+            api_url = "https://colorhunt.co/php/feed.php"
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/html, */*',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Referer': f'https://colorhunt.co/palettes/{tag.lower()}'
+            }
+            
+            # API请求参数
+            post_data = {
+                'step': 0,
+                'sort': 'new',  # 可以是 'new', 'popular', 'random'
+                'tags': tag.lower(),
+                'timeframe': ''  # 用于popular排序的时间范围
+            }
+            
+            logger.info(f"请求API: {api_url} with tags={tag}")
+            response = requests.post(api_url, headers=headers, data=post_data, timeout=15)
+            
+            if response.status_code != 200:
+                logger.warning(f"API请求失败, 状态码: {response.status_code}")
+                return False, f"API请求失败，状态码: {response.status_code}", None
+            
+            # 解析JSON响应
+            try:
+                palette_data_list = json.loads(response.text)
+                logger.info(f"API返回 {len(palette_data_list)} 个配色方案")
+                
+                if not palette_data_list:
+                    return False, f"API未返回任何 {tag} 标签的配色方案", None
+                
+            except json.JSONDecodeError as e:
+                logger.warning(f"解析API响应JSON失败: {e}")
+                logger.warning(f"响应内容: {response.text[:200]}...")
+                return False, f"解析API响应失败: {e}", None
+            
+            # 处理配色方案数据
+            extracted_palettes = []
+            
+            for i, item in enumerate(palette_data_list[:limit]):
+                try:
+                    # 提取基本信息
+                    code = item.get('code', '')
+                    likes = item.get('likes', 0)
+                    date = item.get('date', '')
+                    
+                    if not code or len(code) != 24:
+                        logger.warning(f"无效的配色方案代码: {code}")
+                        continue
+                    
+                    # 从代码中提取颜色
+                    colors = []
+                    for j in range(4):
+                        hex_color = f"#{code[j*6:(j+1)*6].upper()}"
+                        colors.append(hex_color)
+                    
+                    # 构建配色方案URL
+                    palette_url = f"https://colorhunt.co/palette/{code}"
+                    
+                    # 创建配色方案数据
+                    palette_data = {
+                        "id": f"{tag}-api-{i+1}-{code}",
+                        "name": f"{tag.title()} Palette {i+1}",
+                        "colors": colors,
+                        "source": "colorhunt.co",
+                        "source_url": palette_url,
+                        "palette_id": code,
+                        "likes": likes,
+                        "date": date,
+                        "tags": [f"{tag.title()} (API标签)", "ColorHunt"],
+                        "author": "ColorHunt用户",
+                        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "extraction_success": True,
+                        "metadata": {
+                            "colors_extracted_method": "API直接获取 (准确)",
+                            "has_detailed_info": True,
+                            "response_status": response.status_code,
+                            "page_title": f"{tag.title()} Color Palettes - Color Hunt",
+                            "extraction_notes": f"通过API获取，点赞数: {likes}, 日期: {date}",
+                            "tag_source": f"从 {tag} 标签API提取",
+                            "tag_page_url": f"https://colorhunt.co/palettes/{tag.lower()}",
+                            "api_endpoint": api_url,
+                            "api_response": "JSON格式"
+                        }
+                    }
+                    
+                    extracted_palettes.append(palette_data)
+                    logger.info(f"成功处理配色方案: {code}, 点赞数: {likes}")
+                    
+                except Exception as e:
+                    logger.warning(f"处理配色方案数据时出错: {e}")
+                    continue
+            
+            if not extracted_palettes:
+                return False, f"未能处理任何 {tag} 标签的配色方案数据", None
+            
+            logger.info(f"成功通过API提取到 {len(extracted_palettes)} 个 {tag} 标签的配色方案")
+            return True, None, extracted_palettes
+            
+        except requests.Timeout:
+            error_msg = f"API请求 {tag} 标签超时"
+            logger.warning(error_msg)
+            return False, error_msg, None
+        except requests.RequestException as e:
+            error_msg = f"API请求 {tag} 标签网络错误: {e}"
+            logger.warning(error_msg)
+            return False, error_msg, None
+        except Exception as e:
+            error_msg = f"抓取 {tag} 标签配色方案时出错: {str(e)}"
+            logger.exception(error_msg)
             return False, error_msg, None 

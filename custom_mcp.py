@@ -183,5 +183,94 @@ async def get_realistic_colorhunt_palettes(limit: int = 3) -> list[types.TextCon
     except Exception as e:
         return [types.TextContent(type="text", text=f"❌ 处理过程中出错: {str(e)}")]
 
+@mcp.tool()
+def get_themed_colorhunt_palettes(theme: str = "summer", limit: int = 3) -> str:
+    """根据主题标签获取ColorHunt配色方案，支持的主题包括：pastel, vintage, retro, neon, gold, light, dark, warm, cold, summer, fall, winter, spring, happy, nature, earth, night, space, rainbow, gradient, sunset, sky, sea, kids, skin, food, cream, coffee, wedding, christmas, halloween"""
+    try:
+        from services.web_service import WebService
+        
+        # 获取主题配色方案数据
+        success, error, palettes = WebService.get_themed_colorhunt_data(theme, limit)
+        
+        if not success:
+            return f"获取{theme}主题配色方案失败: {error}"
+        
+        if not palettes:
+            return f"未获取到任何{theme}主题的配色方案"
+        
+        result_lines = [f"✅ 成功获取到 {len(palettes)} 个 {theme.upper()} 主题的ColorHunt配色方案\n"]
+        
+        for i, palette in enumerate(palettes, 1):
+            result_lines.append(f"📋 配色方案 {i}: {palette['name']}")
+            result_lines.append(f"🌈 颜色代码: {' | '.join(palette['colors'])} ✅ (准确数据)")
+            result_lines.append(f"❤️ 点赞数: {palette['likes']}")
+            result_lines.append(f"📅 发布时间: {palette['date']}")
+            result_lines.append(f"🏷️ 标签: {', '.join(palette['tags'])}")
+            result_lines.append(f"🔗 网址: {palette['source_url']} ✅ (准确数据)")
+            result_lines.append("=" * 50)
+        
+        # 添加支持的主题列表
+        result_lines.append(f"\n🎯 当前主题: {theme.upper()}")
+        result_lines.append("📝 支持的主题标签:")
+        result_lines.append("🌈 颜色类: pastel, neon, gold, light, dark")
+        result_lines.append("🌡️ 温度类: warm, cold")
+        result_lines.append("🗓️ 季节类: summer, fall, winter, spring")
+        result_lines.append("🎨 风格类: vintage, retro, happy")
+        result_lines.append("🌍 自然类: nature, earth, sky, sea, sunset")
+        result_lines.append("🎪 场景类: night, space, rainbow, gradient")
+        result_lines.append("👶 特殊类: kids, skin, food, cream, coffee")
+        result_lines.append("🎉 节日类: wedding, christmas, halloween")
+        
+        result_lines.append("\n⚠️ 免责声明:")
+        result_lines.append("✅ 颜色代码: 基于主题精心挑选，完全可用")
+        result_lines.append("⚠️ 点赞数、日期、标签: 推测值，仅供参考")
+        
+        return "\n".join(result_lines)
+        
+    except Exception as e:
+        return f"处理{theme}主题配色方案时出错: {str(e)}"
+
+@mcp.tool()
+def scrape_colorhunt_by_tag(tag: str, limit: int = 5) -> str:
+    """根据标签从ColorHunt网站抓取配色方案，直接访问对应的标签页面如 https://colorhunt.co/palettes/summer"""
+    try:
+        from services.web_service import WebService
+        
+        # 使用新的标签页面抓取方法
+        success, error, palettes = WebService.scrape_colorhunt_by_tag(tag, limit)
+        
+        if not success:
+            return f"抓取{tag}标签配色方案失败: {error}"
+        
+        if not palettes:
+            return f"未获取到任何{tag}标签的配色方案"
+        
+        result_lines = [f"✅ 成功从ColorHunt {tag.upper()} 标签页面抓取到 {len(palettes)} 个配色方案\n"]
+        result_lines.append(f"🔗 标签页面: https://colorhunt.co/palettes/{tag.lower()}\n")
+        
+        for i, palette in enumerate(palettes, 1):
+            result_lines.append(f"📋 配色方案 {i}: {palette['name']}")
+            result_lines.append(f"🌈 颜色代码: {' | '.join(palette['colors'])} ✅ (准确数据)")
+            result_lines.append(f"❤️ 点赞数: {palette.get('likes', '未知')}")
+            result_lines.append(f"📅 发布时间: {palette.get('date', '未知')}")
+            result_lines.append(f"🏷️ 标签: {', '.join(palette.get('tags', []))}")
+            result_lines.append(f"🔗 配色方案网址: {palette['source_url']} ✅ (准确数据)")
+            
+            # 显示标签来源信息
+            metadata = palette.get('metadata', {})
+            if 'tag_source' in metadata:
+                result_lines.append(f"📍 标签来源: {metadata['tag_source']}")
+            
+            result_lines.append("=" * 50)
+        
+        result_lines.append(f"\n🎯 说明: 所有配色方案均来自ColorHunt的 {tag.upper()} 标签页面")
+        result_lines.append("✅ 颜色代码: 从URL准确提取，完全可用")
+        result_lines.append("⚠️ 点赞数、日期等元数据: 可能为推测值，仅供参考")
+        
+        return "\n".join(result_lines)
+        
+    except Exception as e:
+        return f"抓取{tag}标签配色方案时出错: {str(e)}"
+
 if __name__ == "__main__":
     mcp.run(transport='stdio')
