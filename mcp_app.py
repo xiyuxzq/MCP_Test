@@ -35,6 +35,16 @@ def say_hello(name: str) -> str:
     """生成个性化问候语（中英双语版）"""
     return presenter.say_hello(name)
 
+@mcp.tool()
+def scrape_colorhunt_palettes(limit: int = 5) -> str:
+    """抓取 colorhunt.co 配色方案"""
+    return presenter.scrape_colorhunt_palettes(limit)
+
+@mcp.tool()
+def extract_palette_from_image(image_path: str, num_colors: int = 4) -> str:
+    """从图片提取配色方案"""
+    return presenter.extract_palette_from_image(image_path, num_colors)
+
 # 注册MCP资源
 @mcp.resource("config://app_settings")
 def get_app_config() -> dict:
