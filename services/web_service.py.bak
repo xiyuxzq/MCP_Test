@@ -1,0 +1,83 @@
+"""
+网络服务类，负责处理网络请求和网站抓取
+"""
+import os
+import requests
+from typing import Tuple, Optional, List, Dict
+from bs4 import BeautifulSoup
+import json
+import time
+
+class WebService:
+    """网络服务类，提供网站抓取和数据下载功能"""
+    
+    @staticmethod
+    def scrape_huntcolor_palettes(limit: int = 5) -> Tuple[bool, Optional[str], Optional[List[Dict]]]:
+        """
+        抓取colorhunt.co网站的配色方案
+        
+        Args:
+            limit: 要抓取的配色方案数量限制
+            
+        Returns:
+            Tuple[bool, Optional[str], Optional[List[Dict]]]: (是否成功, 错误信息, 配色方案列表)
+        """
+        try:
+            # 创建下载目录
+            download_dir = os.path.expanduser("~/Downloads/colorhunt_palettes")
+            os.makedirs(download_dir, exist_ok=True)
+            
+            # 抓取colorhunt.co网站
+            response = requests.get("https://colorhunt.co/")
+            if response.status_code != 200:
+                return False, f"抓取网站失败，状态码: {response.status_code}", None
+                
+            # 解析HTML
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 查找配色方案元素 - 根据colorhunt.co的HTML结构调整选择器
+            palette_elements = soup.select('.palette')[:limit]
+            
+            if not palette_elements:
+                return False, "未找到配色方案元素", None
+            
+            # 提取配色方案数据
+            palettes = []
+            for idx, elem in enumerate(palette_elements):
+                try:
+                    # 提取颜色代码
+                    colors = []
+                    for color_elem in elem.select('.palette-color'):
+                        # 从style属性中提取背景颜色
+                        style = color_elem.get('style', '')
+                        if 'background:' in style:
+                            color_code = style.split('background:')[1].strip()
+                            colors.append(color_code)
+                    
+                    # 获取方案ID作为名称
+                    palette_id = elem.get('data-id', f"palette-{idx+1}")
+                    
+                    # 将方案保存为JSON文件
+                    palette_data = {
+                        "id": palette_id,
+                        "name": f"ColorHunt Palette {palette_id}",
+                        "colors": colors,
+                        "source": "colorhunt.co",
+                        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                    
+                    file_path = os.path.join(download_dir, f"colorhunt_{palette_id}.json")
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        json.dump(palette_data, f, indent=2)
+                    
+                    palettes.append(palette_data)
+                    
+                except Exception as e:
+                    print(f"处理配色方案时出错: {str(e)}")
+            
+            return True, None, palettes
+            
+        except requests.RequestException as e:
+            return False, f"网络请求错误: {str(e)}", None
+        except Exception as e:
+            return False, f"抓取配色方案时出错: {str(e)}", None 

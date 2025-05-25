@@ -1,0 +1,61 @@
+"""
+MCP视图接口，定义视图层的接口
+"""
+from abc import ABC, abstractmethod
+from typing import List, Any, Dict, Optional
+
+class IMcpView(ABC):
+    """MCP视图接口"""
+    
+    @abstractmethod
+    def show_file_list(self, files: List[str]) -> None:
+        """显示文件列表"""
+        pass
+    
+    @abstractmethod
+    def show_organize_result(self, moved_count: int, errors: List[str]) -> str:
+        """显示整理结果"""
+        pass
+    
+    @abstractmethod
+    def show_app_open_result(self, success: bool, error_message: str = None) -> str:
+        """显示应用程序打开结果"""
+        pass
+    
+    @abstractmethod
+    def show_greeting(self, name: str) -> str:
+        """显示问候语"""
+        pass
+        
+    @abstractmethod
+        
+        if not palettes:
+            return "抓取成功，但未找到配色方案。"
+            
+        palette_count = len(palettes)
+        download_path = "~/Downloads/huntcolor_palettes"
+        
+        # 构建配色信息文本
+        palette_info = []
+        for idx, palette in enumerate(palettes[:3]):  # 只显示前3个配色方案的详情
+            name = palette.get("name", f"Palette-{idx+1}")
+            colors = palette.get("colors", [])
+            color_codes = ", ".join(colors[:5])  # 只显示前5个颜色代码
+            
+            if len(colors) > 5:
+                color_codes += f" 等{len(colors)}个颜色"
+                
+            palette_info.append(f"- {name}: {color_codes}")
+        
+        # 如果配色方案超过3个，添加省略信息
+        if palette_count > 3:
+            palette_info.append(f"...等共{palette_count}个配色方案")
+            
+        palette_details = "\n".join(palette_info)
+        
+        return f"""
+抓取完成! 共获取了 {palette_count} 个配色方案，已保存到 {download_path} 目录。
+
+配色方案概览:
+{palette_details}
+        """.strip() 
