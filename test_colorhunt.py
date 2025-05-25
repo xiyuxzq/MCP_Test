@@ -35,19 +35,17 @@ logger = logging.getLogger(__name__)
 
 def get_palette_urls() -> List[str]:
     """
-    获取调色板URL列表
+    获取调色板URL列表 - 通过API接口获取
     
     Returns:
         List[str]: URL列表
     """
-    # 探索不同类型的调色板页面
-    explore_urls = [
-        "https://colorhunt.co/",
-        "https://colorhunt.co/palettes/popular",
-        "https://colorhunt.co/palettes/new",
-        "https://colorhunt.co/palettes/random",
-        "https://colorhunt.co/palettes/pastel",
-        "https://colorhunt.co/palettes/dark"
+    # 不同分类的标签
+    tag_categories = [
+        "pastel", "vintage", "retro", "neon", "gold", "light", "dark", 
+        "warm", "cold", "summer", "fall", "winter", "spring", "happy", 
+        "nature", "earth", "night", "space", "rainbow", "gradient","sunset",
+        "sky","sea","kids","skin","food","cream","coffee","wedding","christmas","halloween"
     ]
     
     # 收集调色板URL
@@ -55,101 +53,65 @@ def get_palette_urls() -> List[str]:
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+        'Accept': 'application/json, text/html, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer': 'https://colorhunt.co/'
     }
     
-    for url in explore_urls:
+    # 请求不同分类的配色数据
+    for tag in tag_categories:
         try:
-            logger.info(f"探索页面: {url}")
-            response = requests.get(url, headers=headers, timeout=15)
+            logger.info(f"请求分类: {tag}")
+            
+            # 构建POST数据
+            post_data = {
+                'step': 0,
+                'sort': 'new',
+                'tags': tag,
+                'timeframe': ''
+            }
+            
+            # 请求API
+            response = requests.post(
+                'https://colorhunt.co/php/feed.php', 
+                headers=headers, 
+                data=post_data,
+                timeout=10
+            )
+            
             if response.status_code != 200:
-                logger.warning(f"请求 {url} 失败, 状态码: {response.status_code}")
+                logger.warning(f"请求分类 {tag} 失败, 状态码: {response.status_code}")
+                continue
+            
+            # 解析JSON数据
+            try:
+                palette_data = json.loads(response.text)
+                logger.info(f"分类 {tag} 获取到 {len(palette_data)} 个配色方案")
+                
+                # 提取配色代码并构建URL
+                for item in palette_data:
+                    if 'code' in item:
+                        code = item['code']
+                        url = f"https://colorhunt.co/palette/{code}"
+                        if url not in palette_urls:
+                            palette_urls.append(url)
+                            logger.info(f"找到配色URL: {url}")
+                            
+            except json.JSONDecodeError as e:
+                logger.warning(f"解析分类 {tag} 的JSON数据失败: {e}")
                 continue
                 
-            # 保存页面内容以便调试
-            with open(f"colorhunt_page_{url.split('/')[-1] or 'home'}.html", "w", encoding="utf-8") as f:
-                f.write(response.text)
-            
-            # 解析HTML
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # 查找所有调色板链接
-            for link in soup.find_all('a', href=True):
-                href = link.get('href', '')
-                if '/palette/' in href and href.count('/') == 2:
-                    # 构建完整URL
-                    full_url = href if href.startswith('http') else f"https://colorhunt.co{href}"
-                    if full_url not in palette_urls:
-                        palette_urls.append(full_url)
-                        logger.info(f"找到调色板URL: {full_url}")
-                        
-            # 查找所有以六位十六进制数字组成的链接
-            pattern = r'/palette/([0-9a-fA-F]{6}-[0-9a-fA-F]{6}-[0-9a-fA-F]{6}-[0-9a-fA-F]{6})'
-            matches = re.findall(pattern, response.text)
-            for match in matches:
-                full_url = f"https://colorhunt.co/palette/{match}"
-                if full_url not in palette_urls:
-                    palette_urls.append(full_url)
-                    logger.info(f"找到颜色代码URL: {full_url}")
-            
         except Exception as e:
-            logger.warning(f"处理 {url} 时出错: {e}")
-            
-    # 如果没有找到任何调色板URL，使用一些直接的颜色代码URL作为备用
-    if not palette_urls or len(palette_urls) < 20:
-        logger.info("使用备用颜色代码URL补充结果")
-        backup_color_codes = [
-            # 明亮色调系列
-            "f9f7f7-3f72af-112d4e-dbe2ef",  # 蓝白配色
-            "f38181-fce38a-eaffd0-95e1d3",  # 红黄绿配色
-            "f9ed69-f08a5d-b83b5e-6a2c70",  # 黄橙紫配色
-            "222831-393e46-00adb5-eeeeee",  # 深蓝绿配色
-            "fbf0f0-dfd3d3-b8b0b0-7c7575",  # 灰色渐变
-            # 柔和色调系列
-            "f4f9f9-ccf2f4-a4ebf3-aaaaaa",  # 淡蓝灰配色
-            "a8e6cf-dcedc1-ffd3b6-ffaaa5",  # 柔和色调
-            "364f6b-3fc1c9-f5f5f5-fc5185",  # 蓝灰粉配色
-            "084177-687466-cd8d7b-fbc490",  # 深蓝棕配色
-            "e4f9f5-30e3ca-11999e-40514e",  # 青绿配色
-            # 高对比色调系列
-            "f6f6f6-d6e4f0-1e56a0-163172",  # 蓝白配色2
-            "f7fbfc-d6e6f2-b9d7ea-769fcd",  # 蓝色渐变
-            "d3f8e2-e4c1f9-f694c1-ede7b1",  # 柔和彩虹
-            "fff8e1-ffcdd2-f8bbd0-e1bee7",  # 柔和粉色
-            "005c97-363795-7c3679-f96167",  # 蓝紫红配色
-            # 自然色调系列
-            "ff8c94-ffaaa6-ffd8b1-fcf7bb",  # 粉橙黄配色
-            "eef9bf-a7e9af-75b79e-6a8caf",  # 绿蓝渐变
-            "cff1ef-efd9ca-dec0f1-b79ced",  # 柔和绿粉紫
-            "22577a-38a3a5-57cc99-80ed99",  # 蓝绿渐变
-            "c5d7bd-9fb8ad-383e56-aaccbb",  # 自然绿色
-            # 深沉色调系列
-            "2b2e4a-e84545-903749-53354a",  # 深红紫配色
-            "61892f-86c232-222629-474b4f",  # 军绿黑配色
-            "27296d-5e63b6-a393eb-f5c7f7",  # 深紫色系
-            "393e46-00adb5-aad8d3-eeeeee",  # 深灰青配色
-            "ff4b5c-056674-66bfbf-f0f0f0",  # 红青白配色
-            # 活力色调系列
-            "ffb6b9-fae3d9-bbded6-8ac6d1",  # 粉蓝渐变
-            "ffc7c7-ffe2e2-f6f6f6-8785a2",  # 粉白紫配色
-            "bbe1fa-3282b8-0f4c75-1b262c",  # 蓝色渐变
-            "eaac8b-e56b6f-b56576-6d597a",  # 橙红紫配色
-            "f4f4f2-e8e8e8-bbbfca-495464",  # 灰色系
-            # 高明度色调系列
-            "00b8a9-f8f3d4-f6416c-ffde7d",  # 青黄粉配色
-            "51eaea-fffde1-ff9d76-fb3569",  # 青黄橙红
-            "3ec1d3-f6f7d7-ff9a00-ff165d",  # 青黄橙红2
-            "7fe7dc-cff6e2-bce6eb-fef9ff",  # 青绿蓝白
-            "d4f8e8-bde6f1-a1c6ea-8a89c0"   # 青蓝紫渐变
-        ]
-        
-        # 将备用颜色代码添加到URL列表中
-        for code in backup_color_codes:
-            url = f"https://colorhunt.co/palette/{code}"
-            if url not in palette_urls:
-                palette_urls.append(url)
-            
+            logger.warning(f"处理分类 {tag} 时出错: {e}")
+            continue
+    
+    # 如果没有找到任何调色板URL，直接返回空列表，不再补充备用颜色
+    if not palette_urls or len(palette_urls) < 1:
+        logger.info("未能获取到任何调色板URL")
+        return []
+
     logger.info(f"总共找到 {len(palette_urls)} 个调色板URL")
     return palette_urls
 

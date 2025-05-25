@@ -4,8 +4,20 @@ import os
 import shutil
 import pathlib
 import subprocess
+import sys
+
+# 添加项目根目录到 Python 路径
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# 导入MCP组件
+from views.mcp_view import McpView
+from presenters.mcp_presenter import McpPresenter
 
 mcp = FastMCP()
+
+# 创建MVP架构组件
+view = McpView()
+presenter = McpPresenter(view)
 
 @mcp.tool()
 def list_desktop_files() -> list:
@@ -93,6 +105,16 @@ def open_chrome() -> str:
 def say_hello(name: str) -> str:
     """生成个性化问候语（中英双语版）"""
     return f"  你好 {name}! (Hello {name}!)"
+
+@mcp.tool()
+def scrape_colorhunt_palettes(limit: int = 5) -> str:
+    """抓取ColorHunt网站的配色方案"""
+    return presenter.scrape_colorhunt_palettes(limit)
+
+@mcp.tool()
+def test_simple_colorhunt(limit: int = 5) -> str:
+    """测试简化的配色方案抓取"""
+    return presenter.test_simple_colorhunt(limit)
 
 @mcp.resource("config://app_settings")
 def get_app_config() -> dict:

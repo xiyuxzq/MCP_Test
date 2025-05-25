@@ -37,13 +37,13 @@ def say_hello(name: str) -> str:
 
 @mcp.tool()
 def scrape_colorhunt_palettes(limit: int = 5) -> str:
-    """抓取 colorhunt.co 配色方案"""
+    """抓取ColorHunt网站的配色方案"""
     return presenter.scrape_colorhunt_palettes(limit)
 
 @mcp.tool()
-def extract_palette_from_image(image_path: str, num_colors: int = 4) -> str:
-    """从图片提取配色方案"""
-    return presenter.extract_palette_from_image(image_path, num_colors)
+def test_simple_colorhunt(limit: int = 5) -> str:
+    """测试简化的配色方案抓取"""
+    return presenter.test_simple_colorhunt(limit)
 
 # 注册MCP资源
 @mcp.resource("config://app_settings")
