@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-1-f0a8d0f7b5caffc6c6ffebd4",
+  "name": "ColorHunt Popular (Year) Palette",
+  "colors": [
+    "#F0A8D0",
+    "#F7B5CA",
+    "#FFC6C6",
+    "#FFEBD4"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/f0a8d0f7b5caffc6c6ffebd4",
+  "palette_id": "f0a8d0f7b5caffc6c6ffebd4",
+  "likes": 12430,
+  "date": "9 months",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:28:16",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}

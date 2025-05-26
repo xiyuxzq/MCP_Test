@@ -100,7 +100,9 @@ class ColorHuntScraper:
         }
         
         self.available_tags = [
-            "popular", "new", "random", "pastel", "vintage", "retro", "neon", 
+            "popular", "new", "random", 
+            "popular-month", "popular-year", "popular-alltime",
+            "pastel", "vintage", "retro", "neon", 
             "gold", "light", "dark", "warm", "cold", "summer", "fall", "winter", 
             "spring", "happy", "nature", "earth", "night", "space", "rainbow", 
             "gradient", "sunset", "sky", "sea", "kids", "skin", "food", "cream", 
@@ -139,6 +141,12 @@ class ColorHuntScraper:
                 url = 'https://colorhunt.co/'  # 主页默认显示new
             elif tag == 'popular':
                 url = 'https://colorhunt.co/popular'
+            elif tag == 'popular-month':
+                url = 'https://colorhunt.co/popular'  # Popular页面默认显示月度
+            elif tag == 'popular-year':
+                url = 'https://colorhunt.co/popular'  # Popular页面，需要切换到年度
+            elif tag == 'popular-alltime':
+                url = 'https://colorhunt.co/popular'  # Popular页面，需要切换到全部时间
             elif tag == 'random':
                 url = 'https://colorhunt.co/random'
             else:
@@ -200,7 +208,28 @@ class ColorHuntScraper:
                     'step': 0,
                     'sort': 'popular',
                     'tags': '',
-                    'timeframe': '30'  # 30天内的热门
+                    'timeframe': '30'  # 默认30天内的热门
+                }
+            elif tag == 'popular-month':
+                post_data = {
+                    'step': 0,
+                    'sort': 'popular',
+                    'tags': '',
+                    'timeframe': '30'  # 本月热门
+                }
+            elif tag == 'popular-year':
+                post_data = {
+                    'step': 0,
+                    'sort': 'popular',
+                    'tags': '',
+                    'timeframe': '365'  # 本年热门
+                }
+            elif tag == 'popular-alltime':
+                post_data = {
+                    'step': 0,
+                    'sort': 'popular',
+                    'tags': '',
+                    'timeframe': '9999'  # 使用很大的数字表示所有时间
                 }
             elif tag == 'random':
                 post_data = {
@@ -302,7 +331,15 @@ class ColorHuntScraper:
             if title:
                 name = title
             else:
-                name = f"ColorHunt {tag.title()} Palette"
+                # 为Popular子分类生成更友好的名称
+                if tag == 'popular-month':
+                    name = "ColorHunt Popular (Month) Palette"
+                elif tag == 'popular-year':
+                    name = "ColorHunt Popular (Year) Palette"
+                elif tag == 'popular-alltime':
+                    name = "ColorHunt Popular (All Time) Palette"
+                else:
+                    name = f"ColorHunt {tag.title()} Palette"
             
             # 构建URL
             source_url = f"https://colorhunt.co/palette/{code}"

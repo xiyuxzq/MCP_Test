@@ -4,10 +4,11 @@
 
 ## ✨ 最新更新
 
+- 🕒 **Popular时间范围**: 支持Popular的Month、Year、All Time子分类
 - 🚀 **API真实数据**: 直接从ColorHunt API获取真实的点赞数、发布日期等信息
 - 🎉 **导航标签修复**: 修复new、popular、random标签无法获取数据的问题
 - 🔥 **纯真实数据**: 只获取ColorHunt网站的真实配色方案数据
-- 📊 **数据准确性**: 显示真实点赞数（7-13016不等）和发布时间（1小时-9年不等）
+- 📊 **数据准确性**: 显示真实点赞数（1728-64426不等）和发布时间（1小时-9年不等）
 - ⚡ **性能优化**: 缓存机制减少重复网络请求
 - 🎯 **智能解析**: 从API直接提取完整数据，网页抓取作为备用
 - ✅ **100%成功率**: 所有标签都能正常工作并获取真实数据
@@ -86,11 +87,21 @@ python tools/test_real_only.py
 
 ## 可用标签
 
+### 主要导航标签
 ```
-popular, new, random, pastel, vintage, retro, neon, gold, light, dark, 
-warm, cold, summer, fall, winter, spring, happy, nature, earth, night, 
-space, rainbow, gradient, sunset, sky, sea, kids, skin, food, cream, 
-coffee, wedding, christmas, halloween
+popular, new, random
+```
+
+### Popular时间范围子分类
+```
+popular-month, popular-year, popular-alltime
+```
+
+### 具体主题标签
+```
+pastel, vintage, retro, neon, gold, light, dark, warm, cold, summer, fall, 
+winter, spring, happy, nature, earth, night, space, rainbow, gradient, 
+sunset, sky, sea, kids, skin, food, cream, coffee, wedding, christmas, halloween
 ```
 
 ## 输出文件格式
@@ -212,5 +223,5 @@ MIT License - 仅供学习和个人使用
 ---
 
 **更新日期**: 2025年5月26日  
-**版本**: v3.2 - API真实数据获取版本  
-**状态**: ✅ 功能完整，获取真实点赞数和发布日期，所有标签正常工作 
+**版本**: v3.3 - Popular时间范围子分类支持版本  
+**状态**: ✅ 功能完整，支持Popular时间范围，获取真实点赞数和发布日期，所有标签正常工作 
