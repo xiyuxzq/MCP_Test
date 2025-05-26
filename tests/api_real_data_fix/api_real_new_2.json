@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-2-52357b5459ac648db3b2d8ce",
+  "name": "ColorHunt New Palette",
+  "colors": [
+    "#52357B",
+    "#5459AC",
+    "#648DB3",
+    "#B2D8CE"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/52357b5459ac648db3b2d8ce",
+  "palette_id": "52357b5459ac648db3b2d8ce",
+  "likes": 91,
+  "date": "Yesterday",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:20:31",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}

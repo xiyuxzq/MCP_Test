@@ -2,29 +2,33 @@
 
 # MCP框架
 mcp>=1.0.0
+fastmcp>=0.1.0
+pydantic>=2.0.0
+typing-extensions>=4.0.0
 
 # 网络请求和HTML解析
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=4.9.0
+requests>=2.25.0
+beautifulsoup4>=4.9.0
+lxml>=4.6.0
 
 # 图像处理
-Pillow>=10.0.0
+Pillow>=8.0.0
 
 # 数据处理
-pandas>=2.0.0
-numpy>=1.24.0
+pandas>=1.3.0
+numpy>=1.21.0
 
 # 日志和配置
+python-dotenv>=0.19.0
 pyyaml>=6.0
 
 # 测试框架
-pytest>=7.4.0
-pytest-cov>=4.1.0
+pytest>=6.0.0
+pytest-cov>=2.12.0
 
 # 开发工具
-black>=23.0.0
-flake8>=6.0.0
+black>=21.0.0
+flake8>=3.9.0
 mypy>=1.5.0
 
 # 类型提示
@@ -32,6 +36,22 @@ typing-extensions>=4.7.0
 
 # 异步支持
 asyncio>=3.4.3
+aiohttp>=3.8.0
 
 # JSON处理
-jsonschema>=4.19.0 
+jsonschema>=4.19.0
+
+# 文档生成
+sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0
+
+# 数据库支持（可选）
+sqlite3
+
+# GUI工具依赖（可选）
+PyQt5>=5.15.0
+
+# 其他实用工具
+click>=8.0.0
+rich>=10.0.0
+tqdm>=4.60.0 

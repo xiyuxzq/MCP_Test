@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-1-e0ece4f7f2e7d8d3cd797a7e",
+  "name": "ColorHunt Random Palette",
+  "colors": [
+    "#E0ECE4",
+    "#F7F2E7",
+    "#D8D3CD",
+    "#797A7E"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/e0ece4f7f2e7d8d3cd797a7e",
+  "palette_id": "e0ece4f7f2e7d8d3cd797a7e",
+  "likes": 13016,
+  "date": "4 years",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:20:49",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}

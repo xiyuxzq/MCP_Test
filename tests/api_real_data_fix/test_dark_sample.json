@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-1-3a0519670d2fa53860ef88ad",
+  "name": "ColorHunt Dark Palette",
+  "colors": [
+    "#3A0519",
+    "#670D2F",
+    "#A53860",
+    "#EF88AD"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/3a0519670d2fa53860ef88ad",
+  "palette_id": "3a0519670d2fa53860ef88ad",
+  "likes": 1986,
+  "date": "3 weeks",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:20:51",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}

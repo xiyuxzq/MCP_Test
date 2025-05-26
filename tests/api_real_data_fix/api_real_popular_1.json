@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-1-222831393e46948979dfd0b8",
+  "name": "ColorHunt Popular Palette",
+  "colors": [
+    "#222831",
+    "#393E46",
+    "#948979",
+    "#DFD0B8"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/222831393e46948979dfd0b8",
+  "palette_id": "222831393e46948979dfd0b8",
+  "likes": 2934,
+  "date": "4 weeks",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:20:30",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}

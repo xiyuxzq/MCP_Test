@@ -1,0 +1,20 @@
+{
+  "id": "colorhunt-api-3-ecfae5ddf6d2cae8bdb0db9c",
+  "name": "ColorHunt Pastel Palette",
+  "colors": [
+    "#ECFAE5",
+    "#DDF6D2",
+    "#CAE8BD",
+    "#B0DB9C"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/ecfae5ddf6d2cae8bdb0db9c",
+  "palette_id": "ecfae5ddf6d2cae8bdb0db9c",
+  "likes": 1082,
+  "date": "1 week",
+  "tags": [],
+  "author": "",
+  "timestamp": "2025-05-26 09:20:32",
+  "extraction_method": "Direct API data",
+  "api_source": true
+}
