@@ -1,0 +1,28 @@
+{
+  "id": "colorhunt-api-2-626f47a4b465f5ecd5f0bb78",
+  "name": "ColorHunt Popular Palette",
+  "colors": [
+    "#626F47",
+    "#A4B465",
+    "#F5ECD5",
+    "#F0BB78"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/626f47a4b465f5ecd5f0bb78",
+  "palette_id": "626f47a4b465f5ecd5f0bb78",
+  "likes": 2348,
+  "date": "4 weeks",
+  "tags": [
+    "Pastel",
+    "Vintage",
+    "Retro",
+    "Neon",
+    "Gold",
+    "Light",
+    "Dark",
+    "Warm"
+  ],
+  "timestamp": "2025-05-26 09:41:21",
+  "extraction_method": "Direct API data with webpage tags",
+  "api_source": true
+}

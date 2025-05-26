@@ -1,0 +1,28 @@
+{
+  "id": "colorhunt-api-1-ffe99affd586ffaaaaff9898",
+  "name": "ColorHunt Vintage Palette",
+  "colors": [
+    "#FFE99A",
+    "#FFD586",
+    "#FFAAAA",
+    "#FF9898"
+  ],
+  "source": "colorhunt.co",
+  "source_url": "https://colorhunt.co/palette/ffe99affd586ffaaaaff9898",
+  "palette_id": "ffe99affd586ffaaaaff9898",
+  "likes": 449,
+  "date": "3 days",
+  "tags": [
+    "Pastel",
+    "Vintage",
+    "Retro",
+    "Neon",
+    "Gold",
+    "Light",
+    "Dark",
+    "Warm"
+  ],
+  "timestamp": "2025-05-26 09:41:22",
+  "extraction_method": "Direct API data with webpage tags",
+  "api_source": true
+}

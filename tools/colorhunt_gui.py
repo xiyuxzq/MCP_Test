@@ -315,34 +315,26 @@ class ColorHuntScraper:
             elif not isinstance(likes, int):
                 likes = 0
             
-            # 获取真实的日期
-            date = api_item.get('date', time.strftime("%Y-%m-%d"))
+            # 获取真实的日期 - 直接使用API返回的相对时间格式
+            date = api_item.get('date', '')
             if not date:
-                date = time.strftime("%Y-%m-%d")
-            
-            # 获取其他可能的API数据
-            title = api_item.get('title', '')
-            author = api_item.get('author', '')
-            tags_list = api_item.get('tags', [])
-            if isinstance(tags_list, str):
-                tags_list = [tags_list] if tags_list else []
+                date = time.strftime("%Y-%m-%d")  # 如果API没有日期，使用当前日期作为备用
             
             # 构建配色方案名称
-            if title:
-                name = title
+            if tag == 'popular-month':
+                name = "ColorHunt Popular (Month) Palette"
+            elif tag == 'popular-year':
+                name = "ColorHunt Popular (Year) Palette"
+            elif tag == 'popular-alltime':
+                name = "ColorHunt Popular (All Time) Palette"
             else:
-                # 为Popular子分类生成更友好的名称
-                if tag == 'popular-month':
-                    name = "ColorHunt Popular (Month) Palette"
-                elif tag == 'popular-year':
-                    name = "ColorHunt Popular (Year) Palette"
-                elif tag == 'popular-alltime':
-                    name = "ColorHunt Popular (All Time) Palette"
-                else:
-                    name = f"ColorHunt {tag.title()} Palette"
+                name = f"ColorHunt {tag.title()} Palette"
             
             # 构建URL
             source_url = f"https://colorhunt.co/palette/{code}"
+            
+            # 使用用户选择的标签作为默认标签，而不是推断的标签
+            tags_list = self.get_user_selected_tags(tag)
             
             # 创建配色方案数据
             palette_data = {
@@ -353,20 +345,131 @@ class ColorHuntScraper:
                 "source_url": source_url,
                 "palette_id": code,
                 "likes": likes,  # 真实的点赞数
-                "date": date,    # 真实的日期
-                "tags": tags_list,
-                "author": author,
+                "date": date,    # 真实的相对时间格式日期
+                "tags": tags_list,  # 用户选择的标签
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "extraction_method": "Direct API data",
+                "extraction_method": "Direct API data with user selected tags",
                 "api_source": True  # 标记这是来自API的真实数据
             }
             
-            logger.info(f"从API创建配色方案: {name}, 点赞数: {likes}, 日期: {date}")
+            logger.info(f"从API创建配色方案: {name}, 点赞数: {likes}, 日期: {date}, 标签: {tags_list}")
             return palette_data
             
         except Exception as e:
             logger.warning(f"从API数据创建配色方案失败: {e}")
             return None
+
+    def get_user_selected_tags(self, tag: str) -> List[str]:
+        """
+        根据用户选择的标签返回相应的标签列表
+        
+        Args:
+            tag: 用户选择的标签名称
+            
+        Returns:
+            List[str]: 标签列表
+        """
+        # 简化标签设置：直接使用用户选择的标签
+        if tag == 'popular-month':
+            return ['Popular-month']
+        elif tag == 'popular-year':
+            return ['Popular-year']
+        elif tag == 'popular-alltime':
+            return ['Popular-alltime']
+        else:
+            # 对于所有其他标签，直接使用标签名称
+            return [tag.title()]
+
+    def get_tags_from_webpage(self, url: str) -> List[str]:
+        """
+        从配色方案网页获取标签信息 - 由于技术限制，改为基于颜色分析的智能标签推断
+        
+        Args:
+            url: 配色方案URL
+            
+        Returns:
+            List[str]: 标签列表
+        """
+        # 从URL提取配色代码
+        palette_id = url.split('/')[-1]
+        if len(palette_id) == 24:
+            colors = []
+            for i in range(4):
+                hex_color = f"#{palette_id[i*6:(i+1)*6].upper()}"
+                colors.append(hex_color)
+            
+            # 使用颜色分析推断标签
+            return self.analyze_colors_for_tags(colors)
+        
+        return []
+
+    def analyze_colors_for_tags(self, colors: List[str]) -> List[str]:
+        """
+        基于颜色分析推断标签
+        
+        Args:
+            colors: 颜色列表
+            
+        Returns:
+            List[str]: 推断的标签列表
+        """
+        all_tags = set()
+        
+        # 颜色分析规则
+        color_rules = {
+            'green': lambda r, g, b: g > r and g > b and g > 100,
+            'sage': lambda r, g, b: 90 <= r <= 120 and 100 <= g <= 130 and 60 <= b <= 80,
+            'beige': lambda r, g, b: r > 200 and g > 200 and b > 180 and abs(r-g) < 30,
+            'earth': lambda r, g, b: (r > g > b) or (r > 100 and g > 80 and b < 100),
+            'nature': lambda r, g, b: g > r or g > b,  # 绿色系
+            'warm': lambda r, g, b: r > 150 or (r > g and r > b),
+            'light': lambda r, g, b: r > 200 and g > 200 and b > 200,
+            'pastel': lambda r, g, b: min(r, g, b) > 150 and max(r, g, b) < 255,
+            'vintage': lambda r, g, b: max(r, g, b) - min(r, g, b) < 100 and max(r, g, b) < 200,
+            'dark': lambda r, g, b: max(r, g, b) < 100,
+            'bright': lambda r, g, b: max(r, g, b) > 200 and (max(r, g, b) - min(r, g, b)) > 100,
+            'muted': lambda r, g, b: (max(r, g, b) - min(r, g, b)) < 50,
+            'blue': lambda r, g, b: b > r and b > g and b > 100,
+            'red': lambda r, g, b: r > g and r > b and r > 150,
+            'yellow': lambda r, g, b: r > 200 and g > 200 and b < 150,
+            'orange': lambda r, g, b: r > 200 and g > 150 and b < 100,
+            'purple': lambda r, g, b: r > 100 and b > 100 and g < min(r, b),
+            'pink': lambda r, g, b: r > 200 and b > 150 and g < r,
+            'brown': lambda r, g, b: r > g > b and r < 150 and g < 120,
+            'gray': lambda r, g, b: abs(r-g) < 20 and abs(g-b) < 20 and abs(r-b) < 20,
+            'cream': lambda r, g, b: r > 240 and g > 230 and b > 200,
+            'gold': lambda r, g, b: r > 200 and g > 180 and b < 100,
+            'sky': lambda r, g, b: b > r and b > g and b > 150 and r < 200,
+            'ocean': lambda r, g, b: b > g > r and b > 100,
+            'forest': lambda r, g, b: g > r and g > b and g < 150,
+            'sunset': lambda r, g, b: r > 200 and g > 100 and b < 150,
+            'summer': lambda r, g, b: (r > 200 or g > 200) and b < 200,
+            'winter': lambda r, g, b: max(r, g, b) < 150 or (r > 200 and g > 200 and b > 200),
+            'spring': lambda r, g, b: g > 150 and (r > 150 or b > 150),
+            'fall': lambda r, g, b: r > 150 and g > 100 and b < 150
+        }
+        
+        for color in colors:
+            # 移除#号并转换为RGB
+            hex_color = color.lstrip('#')
+            try:
+                r = int(hex_color[0:2], 16)
+                g = int(hex_color[2:4], 16)
+                b = int(hex_color[4:6], 16)
+                
+                # 应用颜色规则
+                for tag, rule in color_rules.items():
+                    if rule(r, g, b):
+                        all_tags.add(tag.title())
+                        
+            except ValueError:
+                continue
+        
+        # 转换为列表并限制数量
+        tags = sorted(list(all_tags))[:8]  # 最多8个标签
+        
+        logger.info(f"基于颜色分析推断的标签: {tags}")
+        return tags
 
     def extract_palette_data_from_url(self, url: str, idx: int = 0) -> Optional[Dict]:
         """
@@ -480,6 +583,7 @@ class ColorHuntScraper:
                 "palette_id": palette_id,
                 "likes": 0,  # 网页抓取无法获取真实点赞数
                 "date": time.strftime("%Y-%m-%d"),
+                "tags": ['ColorHunt', 'Palette'],  # 备用标签
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "extraction_method": "Webpage scraping (fallback)",
                 "api_source": False  # 标记这不是来自API的数据
